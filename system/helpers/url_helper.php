@@ -531,6 +531,11 @@ if ( ! function_exists('redirect'))
 	 */
 	function redirect($uri = '', $method = 'auto', $code = NULL)
 	{
+		if (headers_sent())
+		{
+			throw new RuntimeException("Cannot modify header information - headers already sent", 500);
+		}
+
 		if ( ! preg_match('#^(\w+:)?//#i', $uri))
 		{
 			$uri = site_url($uri);
@@ -567,3 +572,4 @@ if ( ! function_exists('redirect'))
 		exit;
 	}
 }
+

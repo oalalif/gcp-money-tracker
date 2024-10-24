@@ -19,15 +19,17 @@ class Records extends CI_Controller {
         $this->load->helper(array('form', 'url'));
         $this->load->library('form_validation');
 
-        $this->form_validation->set_rules('amount', 'Amount', 'required');
-        $this->form_validation->set_rules('name', 'Name', 'required');
-        $this->form_validation->set_rules('date', 'Date', 'required');
-        $this->form_validation->set_rules('recordtype', 'Record Type', 'required');
+        $this->form_validation->set_rules('amount', 'Amount', 'required|numeric');
+        $this->form_validation->set_rules('name', 'Name', 'required|min_length[3]');
+        $this->form_validation->set_rules('date', 'Date', 'required|valid_date');
+        $this->form_validation->set_rules('recordtype', 'Record Type', 'required|in_list[expense,income]');
 
-        if ($this->form_validation->run() == FALSE) {
+        if ($this->form_validation->run() === FALSE) {
             $this->load->view('add_records');
         } else {
-            $this->insertrecord();
+            $files = !empty($_FILES['attachment']['tmp_name']) ? fopen($_FILES['attachment']['tmp_name'], 'r') : null;
+            $this->record_model->insertRecord($files);
+            redirect('records');
         }
     }
 
@@ -40,17 +42,22 @@ class Records extends CI_Controller {
     }
 
     public function insertrecord() {
-        $this->record_model->insertRecord();
+        $files = null;
+        if (!empty($_FILES['attachment']['tmp_name'])) {
+            $files = fopen($_FILES['attachment']['tmp_name'], 'r');
+        }
+        $this->record_model->insertRecord($files);
+        $this->output->enable_profiler(FALSE);
         redirect('records');
     }
 
     public function editrecord($id) {
         $this->load->library('form_validation');
 
-        $this->form_validation->set_rules('amount', 'Amount', 'required');
-        $this->form_validation->set_rules('name', 'Name', 'required');
-        $this->form_validation->set_rules('date', 'Date', 'required');
-        $this->form_validation->set_rules('recordtype', 'Record Type', 'required');
+        $this->form_validation->set_rules('amount', 'Amount', 'required|numeric');
+        $this->form_validation->set_rules('name', 'Name', 'required|min_length[3]');
+        $this->form_validation->set_rules('date', 'Date', 'required|valid_date');
+        $this->form_validation->set_rules('recordtype', 'Record Type', 'required|in_list[expense,income]');
 
         if ($this->form_validation->run() == FALSE) {
             $this->edit($id);
