@@ -1,29 +1,28 @@
 'use strict'
 const {Storage} = require('@google-cloud/storage')
-const fs = require('fs')
 const dateFormat = require('dateformat')
-const path = require('path');
+const path = require('path')
 
 const pathKey = path.resolve('./serviceaccountkey.json')
 
-// TODO: Sesuaikan konfigurasi Storage
 const gcs = new Storage({
-    projectId: 'project_id_Anda',
+    projectId: 'submission-mgce-fatahillah',
     keyFilename: pathKey
 })
 
-// TODO: Tambahkan nama bucket yang digunakan
-const bucketName = 'nama_GCS_bucket_Anda'
+const bucketName = 'submission-mgce-fatahillah-storage'
 const bucket = gcs.bucket(bucketName)
 
 function getPublicUrl(filename) {
-    return 'https://storage.googleapis.com/' + bucketName + '/' + filename;
+    return filename ? `https://storage.googleapis.com/${bucketName}/${filename}` : null;
 }
 
 let ImgUpload = {}
 
 ImgUpload.uploadToGcs = (req, res, next) => {
-    if (!req.file) return next()
+    if (!req || !req.file) {
+        return next()
+    }
 
     const gcsname = dateFormat(new Date(), "yyyymmdd-HHMMss")
     const file = bucket.file(gcsname)
@@ -49,3 +48,4 @@ ImgUpload.uploadToGcs = (req, res, next) => {
 }
 
 module.exports = ImgUpload
+
