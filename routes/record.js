@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
     user: 'root',
     database: 'money-db',
     password: '12345678'
-})
+});
 
 router.get("/dashboard", (req, res) => {
     const query = "select (select count(*) from records where month(records.date) = month(now()) AND year(records.date) = year(now())) as month_records, (select sum(amount) from records) as total_amount;"
