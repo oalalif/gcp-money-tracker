@@ -6,16 +6,17 @@ const path = require('path');
 
 const pathKey = path.resolve('./serviceaccountkey.json')
 
-// TODO: Sesuaikan konfigurasi Storage
+// Konfigurasi Storage dengan kredensial dan project ID
 const gcs = new Storage({
-    projectId: 'project_id_Anda',
+    projectId: 'submission-mgce-fatahillah',
     keyFilename: pathKey
 })
 
-// TODO: Tambahkan nama bucket yang digunakan
-const bucketName = 'nama_GCS_bucket_Anda'
+// Nama bucket yang digunakan
+const bucketName = 'submission-mgce-fatahillah-storage'
 const bucket = gcs.bucket(bucketName)
 
+// Fungsi untuk membuat URL publik berdasarkan nama file
 function getPublicUrl(filename) {
     return 'https://storage.googleapis.com/' + bucketName + '/' + filename;
 }
@@ -25,9 +26,12 @@ let ImgUpload = {}
 ImgUpload.uploadToGcs = (req, res, next) => {
     if (!req.file) return next()
 
-    const gcsname = dateFormat(new Date(), "yyyymmdd-HHMMss")
+    // Tambahkan ekstensi .jpeg ke nama file yang telah diformat tanggalnya
+    const timestamp = dateFormat(new Date(), "yyyymmdd-HHMMss")
+    const gcsname = `${timestamp}.jpeg`
     const file = bucket.file(gcsname)
 
+    // Membuat stream untuk menulis file ke Google Cloud Storage
     const stream = file.createWriteStream({
         metadata: {
             contentType: req.file.mimetype
