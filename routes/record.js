@@ -11,11 +11,11 @@ const multer = Multer({
 
 // TODO: Sesuaikan konfigurasi database
 const connection = mysql.createConnection({
-    host: 'public_ip_sql_instance_Anda',
+    host: '34.128.69.255',
     user: 'root',
-    database: 'nama_database_Anda',
-    password: 'password_sql_Anda'
-})
+    database: 'money-db',
+    password: '12345678'
+});
 
 router.get("/dashboard", (req, res) => {
     const query = "select (select count(*) from records where month(records.date) = month(now()) AND year(records.date) = year(now())) as month_records, (select sum(amount) from records) as total_amount;"
