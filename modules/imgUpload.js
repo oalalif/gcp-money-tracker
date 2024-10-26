@@ -6,7 +6,7 @@ const path = require('path');
 
 const pathKey = path.resolve('./serviceaccountkey.json')
 
-// Konfigurasi Google Cloud Storage
+// Konfigurasi Storage dengan kredensial dan project ID
 const gcs = new Storage({
     projectId: 'submission-mgce-fatahillah',
     keyFilename: pathKey
@@ -21,31 +21,14 @@ function getPublicUrl(filename) {
     return 'https://storage.googleapis.com/' + bucketName + '/' + filename;
 }
 
-// Fungsi untuk mengonversi mimetype menjadi ekstensi file
-function getFileExtension(mimetype) {
-    switch (mimetype) {
-        case 'image/jpeg':
-            return '.jpeg';
-        case 'image/png':
-            return '.png';
-        case 'image/gif':
-            return '.gif';
-        default:
-            return ''; // Jika format tidak didukung, tanpa ekstensi
-    }
-}
-
 let ImgUpload = {}
 
 ImgUpload.uploadToGcs = (req, res, next) => {
     if (!req.file) return next()
 
-    // Mendapatkan ekstensi file berdasarkan mimetype
-    const fileExtension = getFileExtension(req.file.mimetype)
-
-    // Format nama file menggunakan timestamp ditambah ekstensi file yang sesuai
+    // Tambahkan ekstensi .jpeg ke nama file yang telah diformat tanggalnya
     const timestamp = dateFormat(new Date(), "yyyymmdd-HHMMss")
-    const gcsname = `${timestamp}${fileExtension}`
+    const gcsname = `${timestamp}.jpeg`
     const file = bucket.file(gcsname)
 
     // Membuat stream untuk menulis file ke Google Cloud Storage
