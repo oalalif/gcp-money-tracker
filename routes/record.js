@@ -76,17 +76,15 @@ router.get("/getrecord/:id", (req, res) => {
 
 router.get("/searchrecords", (req, res) => {
     const s = req.query.s;
-
-    console.log(s)
-    const query = "SELECT * FROM records WHERE name LIKE '%" + s + "%' or notes LIKE '%" + s + "%'"
-    connection.query(query, (err, rows, field) => {
-        if(err) {
-            res.status(500).send({message: err.sqlMessage})
+    const query = "SELECT * FROM records WHERE name LIKE ? OR notes LIKE ? OR CAST(amount AS CHAR) LIKE ?";
+    connection.query(query, [`%${s}%`, `%${s}%`, `%${s}%`], (err, rows) => {
+        if (err) {
+            res.status(500).send({ message: err.sqlMessage });
         } else {
-            res.json(rows)
+            res.json(rows);
         }
-    })
-})
+    });
+});
 
 router.post("/insertrecord", multer.single('attachment'), imgUpload.uploadToGcs, (req, res) => {
     const name = req.body.name
