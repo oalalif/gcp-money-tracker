@@ -84,6 +84,13 @@ class RequestException extends TransferException implements RequestExceptionInte
         } elseif ($level === 5) {
             $label = 'Server error';
             $className = ServerException::class;
+
+            // Additional handling for 500 errors
+            $body = json_decode((string) $response->getBody(), true);
+            if (isset($body['message']) && strpos($body['message'], 'Access denied') !== false) {
+                $label = 'Database Access Error';
+                $handlerContext['database_error'] = $body['message'];
+            }
         } else {
             $label = 'Unsuccessful request';
             $className = __CLASS__;
@@ -91,8 +98,6 @@ class RequestException extends TransferException implements RequestExceptionInte
 
         $uri = \GuzzleHttp\Psr7\Utils::redactUserInfo($request->getUri());
 
-        // Client Error: `GET /` resulted in a `404 Not Found` response:
-        // <html> ... (truncated)
         $message = \sprintf(
             '%s: `%s %s` resulted in a `%s %s` response',
             $label,
@@ -110,6 +115,7 @@ class RequestException extends TransferException implements RequestExceptionInte
 
         return new $className($message, $request, $response, $previous, $handlerContext);
     }
+
 
     /**
      * Get the request that caused the exception
