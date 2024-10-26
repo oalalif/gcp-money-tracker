@@ -55,39 +55,47 @@ class Record_model extends CI_Model {
             $amount = $amount * -1;
         }
 
-        $files;
-        if ($_FILES['attachment']['tmp_name'] !== "") {
+        $files = null;
+        if (!empty($_FILES['attachment']['tmp_name'])) {
             $files = fopen($_FILES['attachment']['tmp_name'], 'r');
         }
 
-        $response = $this->client->request('POST', '/insertrecord', [
-            'multipart' => [
-                [
-                    'name' => 'amount',
-                    'contents' => $amount
-                ],
-                [
-                    'name' => 'name',
-                    'contents' => $this->input->post('name')
-                ],
-                [
-                    'name' => 'date',
-                    'contents' => $this->input->post('date')
-                ],
-                [
-                    'name' => 'notes',
-                    'contents' => $this->input->post('notes')
-                ],
-                [
-                    'name' => 'attachment',
-                    'contents' => $files
-                ]
+        $multipart = [
+            [
+                'name' => 'amount',
+                'contents' => $amount
+            ],
+            [
+                'name' => 'name',
+                'contents' => $this->input->post('name')
+            ],
+            [
+                'name' => 'date',
+                'contents' => $this->input->post('date')
+            ],
+            [
+                'name' => 'notes',
+                'contents' => $this->input->post('notes')
             ]
+        ];
+
+        if ($files !== null) {
+            $multipart[] = [
+                'name' => 'attachment',
+                'contents' => $files
+            ];
+        }
+        $response = $this->client->request('POST', '/insertrecord', [
+            'multipart' => $multipart
         ]);
         $result = json_decode($response->getBody()->getContents(), true);
 
+        if (is_resource($files)) {
+            fclose($files);
+        }
         return $result;
     }
+
 
     public function updateRecord($id) {
         $type = $this->input->post('recordtype');
