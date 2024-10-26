@@ -137,12 +137,11 @@ class Record_model extends CI_Model {
         $result = json_decode($response->getBody()->getContents(), true);
 
         // Tutup handle file jika dibuka
-        if ($files) {
+        if (is_resource($files)) {
             fclose($files);
         }
         return $result;
     }
-
 
     public function deleteRecord($id) {
         $response = $this->client->request('DELETE', '/deleterecord/'.$id, []);
