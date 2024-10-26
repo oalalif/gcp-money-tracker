@@ -102,16 +102,14 @@ class RequestException extends TransferException implements RequestExceptionInte
             $response->getReasonPhrase()
         );
 
-        if ($bodySummarizer) {
-            $summary = $bodySummarizer->summarize($response);
-            if ($summary !== null) {
-                $message .= ":\n{$summary}\n";
-            }
+        $summary = ($bodySummarizer ?? new BodySummarizer())->summarize($response);
+
+        if ($summary !== null) {
+            $message .= ":\n{$summary}\n";
         }
 
         return new $className($message, $request, $response, $previous, $handlerContext);
     }
-
 
     /**
      * Get the request that caused the exception
