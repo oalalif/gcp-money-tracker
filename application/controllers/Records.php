@@ -60,7 +60,18 @@ class Records extends CI_Controller {
             redirect('records');
         }
     }
-
+    
+    public function search() {
+        $keyword = $this->input->post('search');
+        if (empty($keyword)) {
+            redirect('records');
+        }
+        
+        $data['records'] = $this->record_model->searchRecords($keyword);
+        $data['search_keyword'] = $keyword; // untuk menampilkan keyword di input
+        $this->load->view('my_records', $data);
+    }
+    
     public function delete($id) {
         $this->record_model->deleteRecord($id);
         redirect('records');

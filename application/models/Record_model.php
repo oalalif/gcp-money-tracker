@@ -151,6 +151,20 @@ class Record_model extends CI_Model {
         return $result;
     }
 
+    public function searchRecords($keyword) {
+        try {
+            // Menggunakan endpoint search yang sudah ada di backend
+            $response = $this->client->request('GET', '/searchrecords', [
+                'query' => ['s' => $keyword]
+            ]);
+            
+            $result = json_decode($response->getBody()->getContents(), true);
+            return $result;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    
     public function deleteRecord($id) {
         $response = $this->client->request('DELETE', '/deleterecord/'.$id, []);
         $result = json_decode($response->getBody()->getContents(), true);

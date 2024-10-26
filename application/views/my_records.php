@@ -103,8 +103,8 @@
                 <div class="section__content section__content--p30">
                     <div class="container-fluid">
                         <div class="header-wrap">
-                            <form class="form-header" action="" method="POST">
-                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Search for datas &amp; reports..." />
+                            <form class="form-header" action="<?php echo base_url('records/search'); ?>" method="POST">
+                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Search for datas &amp; reports..." value="<?php echo isset($search_keyword) ? $search_keyword : ''; ?>"/>
                                 <button class="au-btn--submit" type="submit">
                                     <i class="zmdi zmdi-search"></i>
                                 </button>
@@ -121,7 +121,17 @@
                     <div class="container-fluid">
                         <div class="row"> 
                             <div class="col-lg-12">
-                                <h2 class="title-1 m-b-25">My Transactions</h2>
+                                <?php if(isset($search_keyword)): ?>
+                                    <div class="search-result-info mb-3">
+                                        <h4>Search Results for: "<?php echo htmlspecialchars($search_keyword); ?>"</h4>
+                                        <a href="<?php echo base_url('records'); ?>" class="btn btn-sm btn-secondary">
+                                            Clear Search
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
+                                <h2 class="title-1 m-b-25">
+                                    <?php echo isset($search_keyword) ? 'Search Results' : 'My Transactions'; ?>
+                                </h2>
                                 <div class="table-responsive table--no-card m-b-40">
                                     <table class="table table-borderless table-striped table-earning">
                                         <thead>
@@ -156,6 +166,7 @@
                 </div>
             <!-- END MAIN CONTENT-->
             <!-- END PAGE CONTAINER-->
+
             </div>
 
     </div>
