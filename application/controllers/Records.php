@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+ob_start(); // Tambahkan ini untuk memulai output buffering
 class Records extends CI_Controller {
 
     public function __construct() {
@@ -65,3 +66,6 @@ class Records extends CI_Controller {
         redirect('records');
     }
 }
+
+// Akhiri output buffering setelah pemanggilan fungsi
+ob_end_flush();

@@ -97,39 +97,52 @@ class Record_model extends CI_Model {
             $amount = $amount * -1;
         }
 
-        $files;
-        if ($_FILES['attachment']['tmp_name'] !== "") {
+        // Inisialisasi variabel `$files` hanya jika ada file yang diunggah
+        $files = null;
+        if (!empty($_FILES['attachment']['tmp_name'])) {
             $files = fopen($_FILES['attachment']['tmp_name'], 'r');
         }
 
-        $response = $this->client->request('PUT', '/editrecord/'.$id, [
-            'multipart' => [
-                [
-                    'name' => 'amount',
-                    'contents' => $amount
-                ],
-                [
-                    'name' => 'name',
-                    'contents' => $this->input->post('name')
-                ],
-                [
-                    'name' => 'date',
-                    'contents' => $this->input->post('date')
-                ],
-                [
-                    'name' => 'notes',
-                    'contents' => $this->input->post('notes')
-                ],
-                [
-                    'name' => 'attachment',
-                    'contents' => $files
-                ]
+        // Membangun array `multipart` berdasarkan apakah `$files` ada
+        $multipart = [
+            [
+                'name' => 'amount',
+                'contents' => $amount
+            ],
+            [
+                'name' => 'name',
+                'contents' => $this->input->post('name')
+            ],
+            [
+                'name' => 'date',
+                'contents' => $this->input->post('date')
+            ],
+            [
+                'name' => 'notes',
+                'contents' => $this->input->post('notes')
             ]
+        ];
+
+        // Tambahkan bagian `attachment` hanya jika file ada
+        if ($files) {
+            $multipart[] = [
+                'name' => 'attachment',
+                'contents' => $files
+            ];
+        }
+        $response = $this->client->request('PUT', '/editrecord/'.$id, [
+            'multipart' => $multipart
         ]);
+
         $result = json_decode($response->getBody()->getContents(), true);
 
+        // Tutup handle file jika dibuka
+        if ($files) {
+            fclose($files);
+        }
         return $result;
     }
+
 
     public function deleteRecord($id) {
         $response = $this->client->request('DELETE', '/deleterecord/'.$id, []);
